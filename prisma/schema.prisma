@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  level     String   @default("A1")
+  focus     String[] @default(["schrijven"])
+  dailyGoal Int      @default(10)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  onboarded Boolean  @default(false)
+
+  vocabularyProgress UserVocabulary[]
+  grammarProgress    UserGrammar[]
+  sessions           LearningSession[]
+
+  @@map("users")
+}
+
+model Vocabulary {
+  id        String @id @default(cuid())
+  dutch     String
+  french    String
+  category  String
+  level     String
+  exampleNl String
+  exampleFr String
+  isBelgian Boolean @default(false)
+  audioText String?
+  order     Int     @default(0)
+
+  userProgress UserVocabulary[]
+
+  @@map("vocabulary")
+}
+
+model UserVocabulary {
+  id            String   @id @default(cuid())
+  userId        String
+  vocabularyId  String
+  easeFactor    Float    @default(2.5)
+  interval      Int      @default(1)
+  repetitions   Int      @default(0)
+  nextReview    DateTime @default(now())
+  lastScore     Int      @default(0)
+  totalCorrect  Int      @default(0)
+  totalAttempts Int      @default(0)
+  mastered      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vocabulary Vocabulary @relation(fields: [vocabularyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, vocabularyId])
+  @@map("user_vocabulary")
+}
+
+model GrammarModule {
+  id          String @id @default(cuid())
+  slug        String @unique
+  titleNl     String
+  description String
+  level       String
+  order       Int
+
+  userProgress UserGrammar[]
+
+  @@map("grammar_modules")
+}
+
+model UserGrammar {
+  id          String    @id @default(cuid())
+  userId      String
+  moduleId    String
+  bestScore   Int       @default(0)
+  attempts    Int       @default(0)
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module GrammarModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
+  @@map("user_grammar")
+}
+
+model LearningSession {
+  id           String   @id @default(cuid())
+  userId       String
+  date         DateTime @default(now())
+  durationMins Int      @default(0)
+  wordsStudied Int      @default(0)
+  xpGained     Int      @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("learning_sessions")
+}
