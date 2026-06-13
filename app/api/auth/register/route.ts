@@ -14,23 +14,13 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { name, email, password } = schema.parse(body)
 
-    const existing = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
-    })
-
+    const existing = await prisma.user.findUnique({ where: { email: email.toLowerCase() } })
     if (existing) {
       return NextResponse.json({ error: 'Dit e-mailadres is al in gebruik.' }, { status: 400 })
     }
 
     const hash = await bcrypt.hash(password, 12)
-
-    await prisma.user.create({
-      data: {
-        name,
-        email: email.toLowerCase(),
-        password: hash,
-      },
-    })
+    await prisma.user.create({ data: { name, email: email.toLowerCase(), password: hash } })
 
     return NextResponse.json({ ok: true })
   } catch (e) {

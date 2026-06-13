@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 
-// GET: Haal woorden op die vandaag herhaald moeten worden
 export async function GET() {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Niet ingelogd.' }, { status: 401 })
@@ -11,24 +10,16 @@ export async function GET() {
   const now = new Date()
 
   const dueItems = await prisma.userVocabulary.findMany({
-    where: {
-      userId: session.user.id,
-      nextReview: { lte: now },
-    },
+    where: { userId: session.user.id, nextReview: { lte: now } },
     include: { vocabulary: true },
     orderBy: { nextReview: 'asc' },
     take: 20,
   })
 
-  // Als er minder dan 5 te herhalen zijn, vul aan met nieuwe woorden
   const newItems =
     dueItems.length < 5
       ? await prisma.userVocabulary.findMany({
-          where: {
-            userId: session.user.id,
-            repetitions: 0,
-            nextReview: { gt: now },
-          },
+          where: { userId: session.user.id, repetitions: 0, nextReview: { gt: now } },
           include: { vocabulary: true },
           orderBy: { vocabulary: { order: 'asc' } },
           take: 10 - dueItems.length,

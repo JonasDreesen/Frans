@@ -14,13 +14,11 @@ export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Niet ingelogd.' }, { status: 401 })
 
-  const body = await req.json()
-  const { userVocabId, quality } = schema.parse(body)
+  const { userVocabId, quality } = schema.parse(await req.json())
 
   const uv = await prisma.userVocabulary.findFirst({
     where: { id: userVocabId, userId: session.user.id },
   })
-
   if (!uv) return NextResponse.json({ error: 'Niet gevonden.' }, { status: 404 })
 
   const result = calculateNextReview(uv.easeFactor, uv.interval, uv.repetitions, quality)
@@ -40,18 +38,11 @@ export async function POST(req: Request) {
     },
   })
 
-  // Log session activity
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-
   await prisma.learningSession.upsert({
-    where: {
-      id: `${session.user.id}-${today.toISOString().slice(0, 10)}`,
-    },
-    update: {
-      wordsStudied: { increment: 1 },
-      xpGained: { increment: correct ? 10 : 3 },
-    },
+    where: { id: `${session.user.id}-${today.toISOString().slice(0, 10)}` },
+    update: { wordsStudied: { increment: 1 }, xpGained: { increment: correct ? 10 : 3 } },
     create: {
       id: `${session.user.id}-${today.toISOString().slice(0, 10)}`,
       userId: session.user.id,

@@ -20,13 +20,11 @@ export async function POST(req: Request) {
   const { level, focus, dailyGoal } = schema.parse(body)
 
   await prisma.$transaction(async (tx) => {
-    // Update user profile
     await tx.user.update({
       where: { id: session.user.id },
       data: { level, focus, dailyGoal, onboarded: true },
     })
 
-    // Seed vocabulary in database
     const levelMap = { A1: ['A1'], A2: ['A1', 'A2'], B1: ['A1', 'A2', 'B1'], B2: ['A1', 'A2', 'B1', 'B2'] }
     const allowed = levelMap[level as keyof typeof levelMap]
     const items = vocabularyData.filter((v) => allowed.includes(v.level))
@@ -37,17 +35,11 @@ export async function POST(req: Request) {
         update: {},
         create: {
           id: `${item.dutch}-${item.french}`.replace(/[^a-zA-Z0-9-]/g, '_').slice(0, 64),
-          dutch: item.dutch,
-          french: item.french,
-          category: item.category,
-          level: item.level,
-          exampleNl: item.exampleNl,
-          exampleFr: item.exampleFr,
-          isBelgian: item.isBelgian,
-          order: item.order,
+          dutch: item.dutch, french: item.french, category: item.category,
+          level: item.level, exampleNl: item.exampleNl, exampleFr: item.exampleFr,
+          isBelgian: item.isBelgian, order: item.order,
         },
       })
-
       await tx.userVocabulary.upsert({
         where: { userId_vocabularyId: { userId: session.user.id, vocabularyId: vocab.id } },
         update: {},
@@ -55,20 +47,12 @@ export async function POST(req: Request) {
       })
     }
 
-    // Seed grammar modules
     for (const mod of grammarModules) {
       const gm = await tx.grammarModule.upsert({
         where: { slug: mod.slug },
         update: {},
-        create: {
-          slug: mod.slug,
-          titleNl: mod.titleNl,
-          description: mod.description,
-          level: mod.level,
-          order: mod.order,
-        },
+        create: { slug: mod.slug, titleNl: mod.titleNl, description: mod.description, level: mod.level, order: mod.order },
       })
-
       await tx.userGrammar.upsert({
         where: { userId_moduleId: { userId: session.user.id, moduleId: gm.id } },
         update: {},

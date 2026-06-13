@@ -38,7 +38,6 @@ export default function RegisterPage() {
       return
     }
 
-    // Auto sign in after registration
     await signIn('credentials', { email, password, redirect: false })
     router.push('/onboarding')
   }
@@ -65,43 +64,18 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="label" htmlFor="name">Voornaam</label>
-              <input
-                id="name"
-                type="text"
-                className="input"
-                placeholder="Jouw naam"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                autoComplete="given-name"
-              />
+              <input id="name" type="text" className="input" placeholder="Jouw naam"
+                value={name} onChange={(e) => setName(e.target.value)} required autoComplete="given-name" />
             </div>
             <div>
               <label className="label" htmlFor="email">E-mailadres</label>
-              <input
-                id="email"
-                type="email"
-                className="input"
-                placeholder="jij@voorbeeld.be"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-              />
+              <input id="email" type="email" className="input" placeholder="jij@voorbeeld.be"
+                value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
             </div>
             <div>
               <label className="label" htmlFor="password">Wachtwoord</label>
-              <input
-                id="password"
-                type="password"
-                className="input"
-                placeholder="Minimaal 8 tekens"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="new-password"
-                minLength={8}
-              />
+              <input id="password" type="password" className="input" placeholder="Minimaal 8 tekens"
+                value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="new-password" minLength={8} />
             </div>
             <button type="submit" disabled={loading} className="btn-primary w-full">
               {loading ? 'Account aanmaken...' : 'Maak account aan'}
@@ -111,9 +85,7 @@ export default function RegisterPage() {
 
         <p className="mt-4 text-center text-sm text-slate-500">
           Al een account?{' '}
-          <Link href="/login" className="font-medium text-blue-600 hover:text-blue-700">
-            Log in
-          </Link>
+          <Link href="/login" className="font-medium text-blue-600 hover:text-blue-700">Log in</Link>
         </p>
       </div>
     </div>

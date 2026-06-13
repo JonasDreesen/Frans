@@ -8,51 +8,22 @@ export async function GET() {
   if (!session) return NextResponse.json({ error: 'Niet ingelogd.' }, { status: 401 })
 
   const userId = session.user.id
-
-  const [
-    user,
-    vocabStats,
-    grammarStats,
-    recentSessions,
-  ] = await Promise.all([
-    prisma.user.findUnique({ where: { id: userId }, select: { level: true, focus: true, dailyGoal: true, createdAt: true } }),
-    prisma.userVocabulary.aggregate({
-      where: { userId },
-      _count: { id: true },
-      _sum: { totalCorrect: true, totalAttempts: true },
-    }),
-    prisma.userGrammar.aggregate({
-      where: { userId },
-      _count: { id: true },
-      _sum: { bestScore: true },
-    }),
-    prisma.learningSession.findMany({
-      where: { userId },
-      orderBy: { date: 'desc' },
-      take: 30,
-    }),
-  ])
-
-  const masteredCount = await prisma.userVocabulary.count({
-    where: { userId, mastered: true },
-  })
-
-  const completedModules = await prisma.userGrammar.count({
-    where: { userId, completed: true },
-  })
-
-  const totalVocab = await prisma.userVocabulary.count({ where: { userId } })
-
   const now = new Date()
-  const dueCount = await prisma.userVocabulary.count({
-    where: { userId, nextReview: { lte: now } },
-  })
 
-  // Streak berekening
+  const [user, masteredCount, completedModules, totalVocab, totalModules, dueCount, recentSessions] =
+    await Promise.all([
+      prisma.user.findUnique({ where: { id: userId }, select: { level: true, focus: true, dailyGoal: true } }),
+      prisma.userVocabulary.count({ where: { userId, mastered: true } }),
+      prisma.userGrammar.count({ where: { userId, completed: true } }),
+      prisma.userVocabulary.count({ where: { userId } }),
+      prisma.userGrammar.count({ where: { userId } }),
+      prisma.userVocabulary.count({ where: { userId, nextReview: { lte: now } } }),
+      prisma.learningSession.findMany({ where: { userId }, orderBy: { date: 'desc' }, take: 30 }),
+    ])
+
   let streak = 0
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-
   for (let i = 0; i < 365; i++) {
     const d = new Date(today)
     d.setDate(d.getDate() - i)
@@ -73,18 +44,8 @@ export async function GET() {
     dailyGoal: user?.dailyGoal ?? 10,
     streak,
     totalXP,
-    vocab: {
-      total: totalVocab,
-      mastered: masteredCount,
-      due: dueCount,
-      correctRate: vocabStats._sum.totalAttempts
-        ? Math.round(((vocabStats._sum.totalCorrect ?? 0) / vocabStats._sum.totalAttempts) * 100)
-        : 0,
-    },
-    grammar: {
-      total: grammarStats._count.id,
-      completed: completedModules,
-    },
+    vocab: { total: totalVocab, mastered: masteredCount, due: dueCount },
+    grammar: { total: totalModules, completed: completedModules },
     weeklyActivity,
   })
 }

@@ -17,11 +17,7 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
 
-    const res = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    })
+    const res = await signIn('credentials', { email, password, redirect: false })
 
     setLoading(false)
 
@@ -55,29 +51,13 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="label" htmlFor="email">E-mailadres</label>
-              <input
-                id="email"
-                type="email"
-                className="input"
-                placeholder="jij@voorbeeld.be"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-              />
+              <input id="email" type="email" className="input" placeholder="jij@voorbeeld.be"
+                value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
             </div>
             <div>
               <label className="label" htmlFor="password">Wachtwoord</label>
-              <input
-                id="password"
-                type="password"
-                className="input"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-              />
+              <input id="password" type="password" className="input" placeholder="••••••••"
+                value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
             </div>
             <button type="submit" disabled={loading} className="btn-primary w-full">
               {loading ? 'Bezig...' : 'Inloggen'}

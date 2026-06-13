@@ -5,7 +5,6 @@ import { prisma } from '@/lib/db'
 import { getModuleBySlug } from '@/lib/content/grammar'
 import { z } from 'zod'
 
-// GET: Haal grammaticamodules op voor de gebruiker
 export async function GET() {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Niet ingelogd.' }, { status: 401 })
@@ -33,7 +32,6 @@ export async function GET() {
   })
 }
 
-// POST: Sla resultaat op van een grammaticamodule
 const submitSchema = z.object({
   slug: z.string(),
   score: z.number().int().min(0).max(100),
@@ -43,8 +41,7 @@ export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Niet ingelogd.' }, { status: 401 })
 
-  const body = await req.json()
-  const { slug, score } = submitSchema.parse(body)
+  const { slug, score } = submitSchema.parse(await req.json())
 
   const mod = await prisma.grammarModule.findUnique({ where: { slug } })
   if (!mod) return NextResponse.json({ error: 'Module niet gevonden.' }, { status: 404 })

@@ -12,13 +12,7 @@ export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Niet ingelogd.' }, { status: 401 })
 
-  const body = await req.json()
-  const { focus } = schema.parse(body)
-
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data: { focus },
-  })
-
+  const { focus } = schema.parse(await req.json())
+  await prisma.user.update({ where: { id: session.user.id }, data: { focus } })
   return NextResponse.json({ ok: true })
 }
