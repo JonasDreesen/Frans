@@ -5,8 +5,6 @@ import Navigation from '@/components/Navigation'
 import { grammarModules, GrammarModule, GrammarExercise } from '@/lib/content/grammar'
 
 interface UserModule {
-  userGrammarId: string
-  moduleId: string
   slug: string
   titleNl: string
   description: string
@@ -17,7 +15,24 @@ interface UserModule {
   completed: boolean
 }
 
+interface Response {
+  value: string
+  correct: boolean
+}
+
 type View = 'list' | 'lesson' | 'exercise' | 'result'
+
+// Vergelijkt antwoorden: hoofdletter-/spatie-ongevoelig, en vergeeft ontbrekende accenten
+const COMBINING_MARKS = new RegExp(`[${String.fromCharCode(0x300)}-${String.fromCharCode(0x36f)}]`, 'g')
+function stripAccents(s: string): string {
+  return s.normalize('NFD').replace(COMBINING_MARKS, '')
+}
+function isCorrect(given: string, expected: string): boolean {
+  const norm = (s: string) => s.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[.!?]+$/, '')
+  const a = norm(given)
+  const b = norm(expected)
+  return a === b || stripAccents(a) === stripAccents(b)
+}
 
 export default function GrammaticaPage() {
   const [userModules, setUserModules] = useState<UserModule[]>([])
@@ -25,10 +40,9 @@ export default function GrammaticaPage() {
   const [view, setView] = useState<View>('list')
   const [activeSlug, setActiveSlug] = useState<string | null>(null)
   const [currentEx, setCurrentEx] = useState(0)
-  const [answers, setAnswers] = useState<Record<string, string>>({})
-  const [submitted, setSubmitted] = useState(false)
+  const [responses, setResponses] = useState<Record<string, Response>>({})
+  const [typed, setTyped] = useState('')
   const [score, setScore] = useState(0)
-  const [showLesson, setShowLesson] = useState(true)
 
   const fetchModules = async () => {
     const res = await fetch('/api/grammar')
@@ -43,27 +57,37 @@ export default function GrammaticaPage() {
   const exercises = activeModule?.exercises ?? []
   const currentExercise: GrammarExercise | undefined = exercises[currentEx]
 
+  // Reset het tekstveld telkens bij een nieuwe oefening
+  useEffect(() => { setTyped('') }, [currentEx, view])
+
   const openModule = (slug: string) => {
     setActiveSlug(slug)
     setView('lesson')
-    setShowLesson(true)
     setCurrentEx(0)
-    setAnswers({})
-    setSubmitted(false)
+    setResponses({})
     setScore(0)
   }
 
-  const submitExercise = async () => {
-    if (!activeModule) return
-    let correct = 0
-    for (const ex of exercises) {
-      const userAnswer = (answers[ex.id] ?? '').toLowerCase().trim()
-      const correctAnswer = ex.answer.toLowerCase().trim()
-      if (userAnswer === correctAnswer) correct++
+  const startExercises = () => {
+    setCurrentEx(0)
+    setResponses({})
+    setView('exercise')
+  }
+
+  const recordAnswer = (ex: GrammarExercise, value: string) => {
+    setResponses((r) => ({ ...r, [ex.id]: { value, correct: isCorrect(value, ex.answer) } }))
+  }
+
+  const goNext = async () => {
+    if (currentEx < exercises.length - 1) {
+      setCurrentEx((c) => c + 1)
+      return
     }
-    const pct = Math.round((correct / exercises.length) * 100)
+    // Laatste oefening → score berekenen en opslaan
+    if (!activeModule) return
+    const correctCount = exercises.filter((ex) => responses[ex.id]?.correct).length
+    const pct = Math.round((correctCount / exercises.length) * 100)
     setScore(pct)
-    setSubmitted(true)
 
     await fetch('/api/grammar', {
       method: 'POST',
@@ -87,6 +111,7 @@ export default function GrammaticaPage() {
     )
   }
 
+  // ─── OVERZICHT ──────────────────────────────────────────────────────────────
   if (view === 'list') {
     return (
       <div className="md:pl-56 min-h-screen bg-slate-50">
@@ -99,49 +124,54 @@ export default function GrammaticaPage() {
             </p>
           </div>
 
-          <div className="space-y-3">
-            {userModules.map((mod, idx) => {
-              const prevCompleted = idx === 0 || userModules[idx - 1].completed
-              const locked = !prevCompleted && !mod.completed
+          {userModules.length === 0 ? (
+            <div className="card text-center py-12">
+              <p className="text-4xl mb-4">📚</p>
+              <p className="text-slate-500">Geen modules gevonden. Herlaad de pagina of doe eerst de niveautest.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {userModules.map((mod, idx) => {
+                const prevCompleted = idx === 0 || userModules[idx - 1].completed
+                const locked = !prevCompleted && !mod.completed
 
-              return (
-                <div
-                  key={mod.slug}
-                  className={`card flex items-center justify-between gap-4 ${locked ? 'opacity-50' : ''}`}
-                >
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                      mod.completed ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'
-                    }`}>
-                      {mod.completed ? '✓' : idx + 1}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-medium text-slate-900">{mod.titleNl}</p>
-                        <span className={`badge ${levelColors[mod.level] ?? 'badge-blue'}`}>{mod.level}</span>
+                return (
+                  <div key={mod.slug} className={`card flex items-center justify-between gap-4 ${locked ? 'opacity-60' : ''}`}>
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                        mod.completed ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'
+                      }`}>
+                        {mod.completed ? '✓' : idx + 1}
                       </div>
-                      <p className="text-sm text-slate-500 truncate">{mod.description}</p>
-                      {mod.attempts > 0 && (
-                        <p className="text-xs text-slate-400 mt-0.5">Beste score: {mod.bestScore}%</p>
-                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium text-slate-900">{mod.titleNl}</p>
+                          <span className={`badge ${levelColors[mod.level] ?? 'badge-blue'}`}>{mod.level}</span>
+                        </div>
+                        <p className="text-sm text-slate-500 truncate">{mod.description}</p>
+                        {mod.attempts > 0 && (
+                          <p className="text-xs text-slate-400 mt-0.5">Beste score: {mod.bestScore}%</p>
+                        )}
+                      </div>
                     </div>
+                    <button
+                      className={locked ? 'btn-secondary py-2 px-3 text-sm cursor-not-allowed' : 'btn-primary py-2 px-3 text-sm'}
+                      onClick={() => !locked && openModule(mod.slug)}
+                      disabled={locked}
+                    >
+                      {locked ? '🔒' : mod.completed ? 'Herhalen' : 'Start'}
+                    </button>
                   </div>
-                  <button
-                    className={locked ? 'btn-secondary py-2 px-3 text-sm opacity-50 cursor-not-allowed' : 'btn-primary py-2 px-3 text-sm'}
-                    onClick={() => !locked && openModule(mod.slug)}
-                    disabled={locked}
-                  >
-                    {locked ? '🔒' : mod.completed ? 'Herhalen' : 'Start'}
-                  </button>
-                </div>
-              )
-            })}
-          </div>
+                )
+              })}
+            </div>
+          )}
         </main>
       </div>
     )
   }
 
+  // ─── LES (uitleg) ───────────────────────────────────────────────────────────
   if (view === 'lesson' && activeModule) {
     return (
       <div className="md:pl-56 min-h-screen bg-slate-50">
@@ -158,20 +188,28 @@ export default function GrammaticaPage() {
             <h1 className="text-xl font-bold text-slate-900 mb-2">{activeModule.titleNl}</h1>
             <p className="text-slate-500 mb-4">{activeModule.description}</p>
 
-            {/* Render explanation as formatted text */}
-            <div className="prose prose-sm max-w-none">
+            <div className="space-y-1 text-sm leading-relaxed">
               {activeModule.explanation.split('\n').map((line, i) => {
-                if (line.startsWith('**') && line.endsWith('**')) {
-                  return <p key={i} className="font-bold text-slate-900 mt-4 mb-1">{line.replace(/\*\*/g, '')}</p>
+                const trimmed = line.trim()
+                if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
+                  return <p key={i} className="font-bold text-slate-900 mt-3">{trimmed.replace(/\*\*/g, '')}</p>
                 }
-                if (line.startsWith('- ')) {
-                  return <p key={i} className="text-slate-700 ml-4">{line}</p>
+                if (trimmed.startsWith('|')) {
+                  const cells = trimmed.split('|').map((c) => c.trim()).filter(Boolean)
+                  if (cells.every((c) => /^[-\s]+$/.test(c))) return null
+                  return (
+                    <div key={i} className="flex gap-2 text-slate-700">
+                      {cells.map((c, j) => (
+                        <span key={j} className={`flex-1 ${j === 0 ? 'font-medium' : ''}`}>{c.replace(/\*\*/g, '')}</span>
+                      ))}
+                    </div>
+                  )
                 }
-                if (line.startsWith('| ') || line.startsWith('|---')) {
-                  return null // Skip markdown tables in simple view
+                if (trimmed.startsWith('- ')) {
+                  return <p key={i} className="text-slate-700 ml-3">• {trimmed.slice(2).replace(/\*\*/g, '')}</p>
                 }
-                if (line.trim() === '') return <div key={i} className="h-2" />
-                return <p key={i} className="text-slate-700">{line}</p>
+                if (trimmed === '') return <div key={i} className="h-1.5" />
+                return <p key={i} className="text-slate-700">{trimmed.replace(/\*\*/g, '')}</p>
               })}
             </div>
 
@@ -182,7 +220,7 @@ export default function GrammaticaPage() {
             )}
           </div>
 
-          <button className="btn-primary w-full" onClick={() => setView('exercise')}>
+          <button className="btn-primary w-full" onClick={startExercises}>
             Oefeningen starten ({exercises.length} oefeningen) →
           </button>
         </main>
@@ -190,8 +228,11 @@ export default function GrammaticaPage() {
     )
   }
 
+  // ─── OEFENING ───────────────────────────────────────────────────────────────
   if (view === 'exercise' && activeModule && currentExercise) {
-    const progress = ((currentEx) / exercises.length) * 100
+    const progress = (currentEx / exercises.length) * 100
+    const response = responses[currentExercise.id]
+    const answered = !!response
 
     return (
       <div className="md:pl-56 min-h-screen bg-slate-50">
@@ -199,9 +240,7 @@ export default function GrammaticaPage() {
         <main className="px-4 py-8 md:px-8 pb-24 md:pb-8 max-w-xl mx-auto">
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <button onClick={() => setView('lesson')} className="text-sm text-slate-500 hover:text-slate-700">
-                ← Uitleg
-              </button>
+              <button onClick={() => setView('lesson')} className="text-sm text-slate-500 hover:text-slate-700">← Uitleg</button>
               <span className="text-sm text-slate-500">{currentEx + 1} / {exercises.length}</span>
             </div>
             <div className="h-2 rounded-full bg-slate-200">
@@ -213,39 +252,25 @@ export default function GrammaticaPage() {
             <h2 className="text-lg font-semibold text-slate-900 mb-4">{currentExercise.question}</h2>
 
             {currentExercise.context && (
-              <p className="mb-4 rounded-lg bg-slate-50 px-4 py-3 font-mono text-slate-700">
-                {currentExercise.context}
-              </p>
+              <p className="mb-4 rounded-lg bg-slate-50 px-4 py-3 font-mono text-slate-700">{currentExercise.context}</p>
             )}
 
+            {/* Meerkeuze */}
             {currentExercise.type === 'multiple_choice' && currentExercise.options && (
               <div className="space-y-2">
                 {currentExercise.options.map((opt) => {
-                  const isAnswered = !!answers[currentExercise.id]
-                  const isSelected = answers[currentExercise.id] === opt
-                  const isCorrect = opt === currentExercise.answer
-
                   let cls = 'w-full rounded-lg border-2 px-4 py-3 text-left text-sm font-medium transition-all '
-                  if (!isAnswered) {
+                  if (!answered) {
                     cls += 'border-slate-200 hover:border-blue-400 hover:bg-blue-50 cursor-pointer'
-                  } else if (isCorrect) {
+                  } else if (opt === currentExercise.answer) {
                     cls += 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                  } else if (isSelected) {
+                  } else if (opt === response.value) {
                     cls += 'border-red-400 bg-red-50 text-red-600'
                   } else {
                     cls += 'border-slate-200 opacity-50'
                   }
-
                   return (
-                    <button
-                      key={opt}
-                      className={cls}
-                      onClick={() => {
-                        if (!answers[currentExercise.id]) {
-                          setAnswers((a) => ({ ...a, [currentExercise.id]: opt }))
-                        }
-                      }}
-                    >
+                    <button key={opt} className={cls} disabled={answered} onClick={() => recordAnswer(currentExercise, opt)}>
                       {opt}
                     </button>
                   )
@@ -253,59 +278,48 @@ export default function GrammaticaPage() {
               </div>
             )}
 
+            {/* Invul / vertaal */}
             {(currentExercise.type === 'fill_blank' || currentExercise.type === 'translate') && (
               <div>
                 <input
                   type="text"
                   className="input text-center font-mono"
                   placeholder={currentExercise.type === 'fill_blank' ? 'Vul in...' : 'Vertaal...'}
-                  value={answers[currentExercise.id] ?? ''}
-                  onChange={(e) => {
-                    if (!answers[currentExercise.id + '_submitted']) {
-                      setAnswers((a) => ({ ...a, [currentExercise.id]: e.target.value }))
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !answers[currentExercise.id + '_submitted']) {
-                      setAnswers((a) => ({ ...a, [currentExercise.id + '_submitted']: 'true' }))
-                    }
-                  }}
-                  disabled={!!answers[currentExercise.id + '_submitted']}
+                  value={answered ? response.value : typed}
+                  onChange={(e) => setTyped(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && typed.trim() && !answered) recordAnswer(currentExercise, typed) }}
+                  disabled={answered}
+                  autoFocus
                 />
-                {!answers[currentExercise.id + '_submitted'] && (
-                  <button
-                    className="btn-primary w-full mt-3"
-                    onClick={() => setAnswers((a) => ({ ...a, [currentExercise.id + '_submitted']: 'true' }))}
-                  >
+                {!answered && (
+                  <button className="btn-primary w-full mt-3" disabled={!typed.trim()} onClick={() => recordAnswer(currentExercise, typed)}>
                     Controleer
                   </button>
                 )}
               </div>
             )}
 
-            {/* Show explanation when answered */}
-            {(answers[currentExercise.id] || answers[currentExercise.id + '_submitted']) && (
-              <div className="mt-4 rounded-lg bg-blue-50 border border-blue-100 px-4 py-3">
-                <p className="text-sm font-medium text-blue-800">
-                  ✓ Antwoord: <span className="font-mono">{currentExercise.answer}</span>
-                </p>
-                <p className="text-sm text-blue-600 mt-1">{currentExercise.explanation}</p>
-              </div>
-            )}
+            {/* Feedback — pas zichtbaar NA antwoorden */}
+            {answered && (
+              <>
+                <div className={`mt-4 rounded-lg border px-4 py-3 ${
+                  response.correct ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'
+                }`}>
+                  <p className={`text-sm font-semibold ${response.correct ? 'text-emerald-700' : 'text-red-600'}`}>
+                    {response.correct ? '✓ Correct!' : '✗ Niet juist'}
+                  </p>
+                  {!response.correct && (
+                    <p className="text-sm text-slate-700 mt-1">
+                      Juiste antwoord: <span className="font-mono font-medium text-blue-700">{currentExercise.answer}</span>
+                    </p>
+                  )}
+                  <p className="text-sm text-slate-600 mt-1">{currentExercise.explanation}</p>
+                </div>
 
-            {(answers[currentExercise.id] || answers[currentExercise.id + '_submitted']) && (
-              <button
-                className="btn-primary w-full mt-4"
-                onClick={() => {
-                  if (currentEx < exercises.length - 1) {
-                    setCurrentEx((c) => c + 1)
-                  } else {
-                    submitExercise()
-                  }
-                }}
-              >
-                {currentEx < exercises.length - 1 ? 'Volgende →' : 'Resultaten bekijken →'}
-              </button>
+                <button className="btn-primary w-full mt-4" onClick={goNext}>
+                  {currentEx < exercises.length - 1 ? 'Volgende →' : 'Resultaten bekijken →'}
+                </button>
+              </>
             )}
           </div>
         </main>
@@ -313,6 +327,7 @@ export default function GrammaticaPage() {
     )
   }
 
+  // ─── RESULTAAT ──────────────────────────────────────────────────────────────
   if (view === 'result') {
     return (
       <div className="md:pl-56 min-h-screen bg-slate-50">
@@ -324,19 +339,15 @@ export default function GrammaticaPage() {
             <p className="text-slate-500 mb-4">Jouw score</p>
             <p className="text-5xl font-bold text-blue-600 mb-2">{score}%</p>
             <p className="text-sm text-slate-500 mb-6">
-              {score >= 70 ? 'Module voltooid! De volgende module is nu beschikbaar.' : 'Probeer opnieuw om de module te voltooien (min. 70%).'}
+              {score >= 70
+                ? 'Module voltooid! De volgende module is nu beschikbaar.'
+                : 'Probeer opnieuw om de module te voltooien (min. 70%).'}
             </p>
             <div className="flex gap-3">
-              <button className="btn-secondary flex-1" onClick={() => {
-                setCurrentEx(0)
-                setAnswers({})
-                setView('exercise')
-              }}>
+              <button className="btn-secondary flex-1" onClick={() => { setCurrentEx(0); setResponses({}); setView('exercise') }}>
                 Herhalen
               </button>
-              <button className="btn-primary flex-1" onClick={() => setView('list')}>
-                Overzicht
-              </button>
+              <button className="btn-primary flex-1" onClick={() => setView('list')}>Overzicht</button>
             </div>
           </div>
         </main>

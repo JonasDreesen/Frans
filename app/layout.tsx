@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import Providers from './providers'
+import AiTutor from '@/components/AiTutor'
 
 export const metadata: Metadata = {
   title: 'Frans Leren - Voor Vlamingen',
@@ -11,7 +12,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="nl">
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <AiTutor />
+        </Providers>
       </body>
     </html>
   )

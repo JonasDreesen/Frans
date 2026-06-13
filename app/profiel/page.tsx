@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import Navigation from '@/components/Navigation'
 import Link from 'next/link'
@@ -102,15 +102,16 @@ export default function ProfielPage() {
           </button>
         </div>
 
-        {/* Olama status */}
+        {/* AI-coach status */}
         <div className="card mb-4">
-          <h2 className="font-semibold text-slate-900 mb-2">🤖 AI-feedback (Ollama)</h2>
+          <h2 className="font-semibold text-slate-900 mb-2">🤖 AI-taalcoach</h2>
           <p className="text-sm text-slate-500 mb-3">
-            Installeer <a href="https://ollama.com" target="_blank" rel="noopener" className="text-blue-600">Ollama</a> lokaal
-            en stel de <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">OLLAMA_BASE_URL</code> omgevingsvariabele
-            in om AI-feedback te activeren.
+            De AI-coach (knop rechtsonder met 🇫🇷) werkt altijd dankzij een ingebouwde coach.
+            Voor slimmere, vrije antwoorden kun je een <strong>gratis</strong> Gemini-sleutel toevoegen
+            via de omgevingsvariabele <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">GEMINI_API_KEY</code>
+            {' '}(verkrijgbaar op <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" className="text-blue-600">aistudio.google.com</a>).
           </p>
-          <OllamaStatus />
+          <AiStatus />
         </div>
 
         {/* Uitloggen */}
@@ -128,31 +129,39 @@ export default function ProfielPage() {
   )
 }
 
-function OllamaStatus() {
-  const [status, setStatus] = useState<'idle' | 'checking' | 'online' | 'offline'>('idle')
+const providerLabels: Record<string, string> = {
+  gemini: 'Google Gemini (volledige AI) ✓',
+  ollama: 'Ollama (lokaal) ✓',
+  ingebouwd: 'Ingebouwde coach (altijd actief)',
+}
+
+function AiStatus() {
+  const [provider, setProvider] = useState<string | null>(null)
+  const [checking, setChecking] = useState(false)
 
   const check = async () => {
-    setStatus('checking')
-    const res = await fetch('/api/ollama', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'pronunciation_tip', context: 'bonjour' }),
-    })
-    setStatus(res.ok ? 'online' : 'offline')
+    setChecking(true)
+    try {
+      const res = await fetch('/api/ai')
+      const data = await res.json()
+      setProvider(data.provider ?? 'ingebouwd')
+    } catch {
+      setProvider('ingebouwd')
+    }
+    setChecking(false)
   }
+
+  useEffect(() => { check() }, [])
+
+  const isFull = provider === 'gemini' || provider === 'ollama'
 
   return (
     <div className="flex items-center gap-3">
-      <div className={`h-2.5 w-2.5 rounded-full ${status === 'online' ? 'bg-emerald-500' : status === 'offline' ? 'bg-red-400' : 'bg-slate-300'}`} />
+      <div className={`h-2.5 w-2.5 rounded-full ${isFull ? 'bg-emerald-500' : provider ? 'bg-amber-400' : 'bg-slate-300'}`} />
       <span className="text-sm text-slate-600">
-        {status === 'idle' && 'Status onbekend'}
-        {status === 'checking' && 'Verbinding controleren...'}
-        {status === 'online' && 'Ollama actief ✓'}
-        {status === 'offline' && 'Ollama niet bereikbaar'}
+        {checking && !provider ? 'Controleren...' : provider ? providerLabels[provider] ?? provider : 'Onbekend'}
       </span>
-      <button onClick={check} className="ml-auto text-xs text-blue-600 hover:underline">
-        {status === 'idle' ? 'Controleer' : 'Opnieuw'}
-      </button>
+      <button onClick={check} className="ml-auto text-xs text-blue-600 hover:underline">Vernieuw</button>
     </div>
   )
 }

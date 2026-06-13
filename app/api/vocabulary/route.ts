@@ -2,12 +2,23 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { seedUserContent } from '@/lib/seed'
 
 export async function GET() {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Niet ingelogd.' }, { status: 401 })
 
   const now = new Date()
+
+  // Zelfherstel: account zonder gekoppelde woordenschat alsnog seeden
+  const existingCount = await prisma.userVocabulary.count({ where: { userId: session.user.id } })
+  if (existingCount === 0) {
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { level: true },
+    })
+    await seedUserContent(session.user.id, user?.level ?? 'A1')
+  }
 
   const dueItems = await prisma.userVocabulary.findMany({
     where: { userId: session.user.id, nextReview: { lte: now } },

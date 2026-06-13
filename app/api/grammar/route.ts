@@ -3,17 +3,32 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { getModuleBySlug } from '@/lib/content/grammar'
+import { seedUserContent } from '@/lib/seed'
 import { z } from 'zod'
 
 export async function GET() {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Niet ingelogd.' }, { status: 401 })
 
-  const userModules = await prisma.userGrammar.findMany({
+  let userModules = await prisma.userGrammar.findMany({
     where: { userId: session.user.id },
     include: { module: true },
     orderBy: { module: { order: 'asc' } },
   })
+
+  // Zelfherstel: account zonder gekoppelde content alsnog seeden
+  if (userModules.length === 0) {
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { level: true },
+    })
+    await seedUserContent(session.user.id, user?.level ?? 'A1')
+    userModules = await prisma.userGrammar.findMany({
+      where: { userId: session.user.id },
+      include: { module: true },
+      orderBy: { module: { order: 'asc' } },
+    })
+  }
 
   return NextResponse.json({
     modules: userModules.map((ug) => ({
