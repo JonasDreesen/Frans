@@ -37,6 +37,7 @@ function isCorrect(given: string, expected: string): boolean {
 export default function GrammaticaPage() {
   const [userModules, setUserModules] = useState<UserModule[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [view, setView] = useState<View>('list')
   const [activeSlug, setActiveSlug] = useState<string | null>(null)
   const [currentEx, setCurrentEx] = useState(0)
@@ -45,9 +46,20 @@ export default function GrammaticaPage() {
   const [score, setScore] = useState(0)
 
   const fetchModules = async () => {
-    const res = await fetch('/api/grammar')
-    const data = await res.json()
-    setUserModules(data.modules ?? [])
+    setError(null)
+    try {
+      const res = await fetch('/api/grammar')
+      if (!res.ok) {
+        if (res.status === 401) setError('Je bent niet (meer) ingelogd. Log opnieuw in.')
+        else setError(`De modules konden niet laden (fout ${res.status}). Controleer /api/health.`)
+        setLoading(false)
+        return
+      }
+      const data = await res.json()
+      setUserModules(data.modules ?? [])
+    } catch {
+      setError('Kon geen verbinding maken met de server.')
+    }
     setLoading(false)
   }
 
@@ -124,7 +136,13 @@ export default function GrammaticaPage() {
             </p>
           </div>
 
-          {userModules.length === 0 ? (
+          {error ? (
+            <div className="card border-red-100 bg-red-50">
+              <p className="font-semibold text-red-700 mb-1">⚠️ Er ging iets mis</p>
+              <p className="text-sm text-red-600 mb-3">{error}</p>
+              <button className="btn-secondary" onClick={() => { setLoading(true); fetchModules() }}>Opnieuw proberen</button>
+            </div>
+          ) : userModules.length === 0 ? (
             <div className="card text-center py-12">
               <p className="text-4xl mb-4">📚</p>
               <p className="text-slate-500">Geen modules gevonden. Herlaad de pagina of doe eerst de niveautest.</p>

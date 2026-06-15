@@ -74,6 +74,19 @@ export default function OefeningPage() {
     synthRef.current.speak(u)
   }
 
+  // Slaat voortgang op (SRS + XP) — werkt voor alle oefenmodi
+  const saveProgress = async (userVocabId: string, correct: boolean) => {
+    try {
+      await fetch('/api/vocabulary/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userVocabId, quality: correct ? 4 : 1 }),
+      })
+    } catch {
+      /* stil falen — geen blokkering van de UI */
+    }
+  }
+
   const startListening = () => {
     const r = recognitionRef.current
     if (!r) return
@@ -92,6 +105,7 @@ export default function OefeningPage() {
       const correct = normalize(t) === normalize(items[current]?.french ?? '')
       setResult(correct ? 'correct' : 'incorrect')
       setSessionCount((c) => c + 1)
+      if (items[current]) saveProgress(items[current].userVocabId, correct)
     }
 
     r.onerror = () => setIsListening(false)
@@ -249,6 +263,7 @@ export default function OefeningPage() {
             onBack={() => setMode(null)}
             onNext={nextItem}
             speak={speak}
+            onResult={(c) => saveProgress(item.userVocabId, c)}
           />
         )}
 
@@ -261,6 +276,7 @@ export default function OefeningPage() {
             onBack={() => setMode(null)}
             onNext={nextItem}
             speak={speak}
+            onResult={(c) => saveProgress(item.userVocabId, c)}
           />
         )}
 
@@ -272,8 +288,8 @@ export default function OefeningPage() {
   )
 }
 
-function ListeningExercise({ item, current, total, onBack, onNext, speak }: {
-  item: VocabItem; current: number; total: number; onBack: () => void; onNext: () => void; speak: (text: string) => void
+function ListeningExercise({ item, current, total, onBack, onNext, speak, onResult }: {
+  item: VocabItem; current: number; total: number; onBack: () => void; onNext: () => void; speak: (text: string) => void; onResult: (correct: boolean) => void
 }) {
   const [typed, setTyped] = useState('')
   const [checked, setChecked] = useState(false)
@@ -290,6 +306,7 @@ function ListeningExercise({ item, current, total, onBack, onNext, speak }: {
     const isCorrect = normalize(typed) === normalize(item.dutch)
     setCorrect(isCorrect)
     setChecked(true)
+    onResult(isCorrect)
   }
 
   return (
@@ -335,8 +352,8 @@ function ListeningExercise({ item, current, total, onBack, onNext, speak }: {
   )
 }
 
-function WritingExercise({ item, current, total, onBack, onNext, speak }: {
-  item: VocabItem; current: number; total: number; onBack: () => void; onNext: () => void; speak: (text: string) => void
+function WritingExercise({ item, current, total, onBack, onNext, speak, onResult }: {
+  item: VocabItem; current: number; total: number; onBack: () => void; onNext: () => void; speak: (text: string) => void; onResult: (correct: boolean) => void
 }) {
   const [typed, setTyped] = useState('')
   const [checked, setChecked] = useState(false)
@@ -349,6 +366,7 @@ function WritingExercise({ item, current, total, onBack, onNext, speak }: {
     const isCorrect = normalize(typed) === normalize(item.french)
     setCorrect(isCorrect)
     setChecked(true)
+    onResult(isCorrect)
     if (isCorrect) speak(item.french)
   }
 

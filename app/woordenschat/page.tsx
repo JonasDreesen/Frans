@@ -37,6 +37,7 @@ export default function WoordenschatPage() {
   const { data: session } = useSession()
   const [items, setItems] = useState<VocabItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [view, setView] = useState<ViewMode>('queue')
   const [current, setCurrent] = useState(0)
   const [options, setOptions] = useState<string[]>([])
@@ -56,9 +57,20 @@ export default function WoordenschatPage() {
 
   const fetchItems = useCallback(async () => {
     setLoading(true)
-    const res = await fetch('/api/vocabulary')
-    const data = await res.json()
-    setItems(data.items ?? [])
+    setError(null)
+    try {
+      const res = await fetch('/api/vocabulary')
+      if (!res.ok) {
+        if (res.status === 401) setError('Je bent niet (meer) ingelogd. Log opnieuw in.')
+        else setError(`De woordenschat kon niet laden (fout ${res.status}). Controleer /api/health.`)
+        setLoading(false)
+        return
+      }
+      const data = await res.json()
+      setItems(data.items ?? [])
+    } catch {
+      setError('Kon geen verbinding maken met de server.')
+    }
     setLoading(false)
   }, [])
 
@@ -153,7 +165,13 @@ export default function WoordenschatPage() {
             <p className="text-slate-500">{items.length} woorden klaar voor herhaling</p>
           </div>
 
-          {items.length === 0 ? (
+          {error ? (
+            <div className="card border-red-100 bg-red-50">
+              <p className="font-semibold text-red-700 mb-1">⚠️ Er ging iets mis</p>
+              <p className="text-sm text-red-600 mb-3">{error}</p>
+              <button className="btn-secondary" onClick={() => fetchItems()}>Opnieuw proberen</button>
+            </div>
+          ) : items.length === 0 ? (
             <div className="card text-center py-12">
               <p className="text-4xl mb-4">🎉</p>
               <h2 className="text-xl font-bold text-slate-900 mb-2">Alles herhaald!</h2>
