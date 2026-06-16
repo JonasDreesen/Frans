@@ -19,6 +19,7 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(false)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [answered, setAnswered] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const question = levelTestQuestions[currentQ]
   const totalQuestions = levelTestQuestions.length
@@ -50,16 +51,33 @@ export default function OnboardingPage() {
 
   const handleFinish = async () => {
     setLoading(true)
+    setError(null)
     const level = calculateLevel(score, maxScore)
 
-    await fetch('/api/onboarding', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ level, focus: selectedFocus, dailyGoal }),
-    })
+    try {
+      const res = await fetch('/api/onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ level, focus: selectedFocus, dailyGoal }),
+      })
 
-    await update({ level, focus: selectedFocus, onboarded: true })
-    router.push('/dashboard')
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Opslaan is mislukt. Probeer opnieuw.')
+      }
+
+      // Pas de sessie pas aan als opslaan in de database écht is gelukt —
+      // anders denk je dat je klaar bent, maar sta je bij de volgende login weer hier.
+      await update({ level, focus: selectedFocus, onboarded: true })
+      router.push('/dashboard')
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : 'Opslaan is mislukt. Controleer je internetverbinding en probeer opnieuw.'
+      )
+      setLoading(false)
+    }
   }
 
   const levelFromScore = calculateLevel(score, maxScore)
@@ -227,8 +245,14 @@ export default function OnboardingPage() {
             </div>
           </div>
 
+          {error && (
+            <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+              ⚠️ {error}
+            </div>
+          )}
+
           <button className="btn-primary w-full" onClick={handleFinish} disabled={loading}>
-            {loading ? 'Bezig met instellen...' : 'Start met leren! 🚀'}
+            {loading ? 'Bezig met instellen...' : error ? 'Opnieuw proberen 🔄' : 'Start met leren! 🚀'}
           </button>
         </div>
       </div>
