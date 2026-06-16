@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import Navigation from '@/components/Navigation'
 import Link from 'next/link'
+import { speakFrench, loadFrenchVoice, hasFrenchVoice } from '@/lib/speech'
+import { isVocabAnswerCorrect } from '@/lib/text'
 
 interface VocabItem {
   userVocabId: string
@@ -26,15 +28,14 @@ export default function OefeningPage() {
   const [transcript, setTranscript] = useState('')
   const [result, setResult] = useState<'correct' | 'incorrect' | null>(null)
   const [sessionCount, setSessionCount] = useState(0)
+  const [noVoice, setNoVoice] = useState(false)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null)
-  const synthRef = useRef<SpeechSynthesis | null>(null)
 
   const focus = session?.user?.focus ?? ['schrijven']
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      synthRef.current = window.speechSynthesis
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const w = window as any
       const SR = w.SpeechRecognition || w.webkitSpeechRecognition
@@ -45,6 +46,7 @@ export default function OefeningPage() {
         recog.interimResults = false
         recognitionRef.current = recog
       }
+      loadFrenchVoice().then(() => setNoVoice(!hasFrenchVoice()))
     }
   }, [])
 
@@ -65,13 +67,7 @@ export default function OefeningPage() {
   }
 
   const speak = (text: string, onEnd?: () => void) => {
-    if (!synthRef.current) return
-    synthRef.current.cancel()
-    const u = new SpeechSynthesisUtterance(text)
-    u.lang = 'fr-FR'
-    u.rate = 0.85
-    if (onEnd) u.onend = onEnd
-    synthRef.current.speak(u)
+    speakFrench(text, { rate: 0.85, onEnd })
   }
 
   // Slaat voortgang op (SRS + XP) — werkt voor alle oefenmodi
@@ -101,8 +97,7 @@ export default function OefeningPage() {
       setTranscript(t)
       setIsListening(false)
 
-      const normalize = (s: string) => s.toLowerCase().trim().replace(/[.,!?]/g, '')
-      const correct = normalize(t) === normalize(items[current]?.french ?? '')
+      const correct = isVocabAnswerCorrect(t, items[current]?.french ?? '')
       setResult(correct ? 'correct' : 'incorrect')
       setSessionCount((c) => c + 1)
       if (items[current]) saveProgress(items[current].userVocabId, correct)
@@ -142,6 +137,13 @@ export default function OefeningPage() {
               <strong>Jouw focus:</strong>{' '}
               {focus.map((f: string) => ({ schrijven: '✍️ Schrijven', luisteren: '👂 Luisteren', spreken: '🗣️ Spreken' }[f] ?? f)).join(', ')}
             </div>
+
+            {noVoice && (
+              <div className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 text-sm text-amber-700">
+                ⚠️ Geen Franse stem gevonden in deze browser, dus uitspraak afspelen werkt hier niet.
+                Probeer Chrome of Edge, of installeer een Franse stem in je systeeminstellingen.
+              </div>
+            )}
 
             {/* Speaking practice */}
             <div className="card">
@@ -302,11 +304,10 @@ function ListeningExercise({ item, current, total, onBack, onNext, speak, onResu
   }, [item.french])
 
   const check = () => {
-    const normalize = (s: string) => s.toLowerCase().trim()
-    const isCorrect = normalize(typed) === normalize(item.dutch)
-    setCorrect(isCorrect)
+    const correct = isVocabAnswerCorrect(typed, item.dutch)
+    setCorrect(correct)
     setChecked(true)
-    onResult(isCorrect)
+    onResult(correct)
   }
 
   return (
@@ -362,12 +363,11 @@ function WritingExercise({ item, current, total, onBack, onNext, speak, onResult
   useEffect(() => { setTyped(''); setChecked(false) }, [item.dutch])
 
   const check = () => {
-    const normalize = (s: string) => s.toLowerCase().trim().replace(/[()]/g, '').trim()
-    const isCorrect = normalize(typed) === normalize(item.french)
-    setCorrect(isCorrect)
+    const correct = isVocabAnswerCorrect(typed, item.french)
+    setCorrect(correct)
     setChecked(true)
-    onResult(isCorrect)
-    if (isCorrect) speak(item.french)
+    onResult(correct)
+    if (correct) speak(item.french)
   }
 
   return (

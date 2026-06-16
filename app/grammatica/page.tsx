@@ -1,8 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Navigation from '@/components/Navigation'
 import { grammarModules, GrammarModule, GrammarExercise } from '@/lib/content/grammar'
+import { speakFrench, loadFrenchVoice } from '@/lib/speech'
+import { isAnswerCorrect as isCorrect } from '@/lib/text'
 
 interface UserModule {
   slug: string
@@ -21,18 +23,6 @@ interface Response {
 }
 
 type View = 'list' | 'lesson' | 'exercise' | 'result'
-
-// Vergelijkt antwoorden: hoofdletter-/spatie-ongevoelig, en vergeeft ontbrekende accenten
-const COMBINING_MARKS = new RegExp(`[${String.fromCharCode(0x300)}-${String.fromCharCode(0x36f)}]`, 'g')
-function stripAccents(s: string): string {
-  return s.normalize('NFD').replace(COMBINING_MARKS, '')
-}
-function isCorrect(given: string, expected: string): boolean {
-  const norm = (s: string) => s.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[.!?]+$/, '')
-  const a = norm(given)
-  const b = norm(expected)
-  return a === b || stripAccents(a) === stripAccents(b)
-}
 
 export default function GrammaticaPage() {
   const [userModules, setUserModules] = useState<UserModule[]>([])
@@ -64,6 +54,7 @@ export default function GrammaticaPage() {
   }
 
   useEffect(() => { fetchModules() }, [])
+  useEffect(() => { loadFrenchVoice() }, [])
 
   const activeModule: GrammarModule | undefined = grammarModules.find((m) => m.slug === activeSlug)
   const exercises = activeModule?.exercises ?? []
@@ -269,12 +260,25 @@ export default function GrammaticaPage() {
           <div className="card">
             <h2 className="text-lg font-semibold text-slate-900 mb-4">{currentExercise.question}</h2>
 
-            {currentExercise.context && (
+            {currentExercise.context && currentExercise.type !== 'listen_choice' && (
               <p className="mb-4 rounded-lg bg-slate-50 px-4 py-3 font-mono text-slate-700">{currentExercise.context}</p>
             )}
 
-            {/* Meerkeuze */}
-            {currentExercise.type === 'multiple_choice' && currentExercise.options && (
+            {/* Luisteren: speel audio af i.p.v. de Franse tekst te tonen */}
+            {currentExercise.type === 'listen_choice' && currentExercise.context && (
+              <div className="mb-4 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => speakFrench(currentExercise.context!)}
+                  className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-4 text-white hover:bg-blue-700 transition-all"
+                >
+                  🔊 Beluister
+                </button>
+              </div>
+            )}
+
+            {/* Meerkeuze (ook gebruikt voor luisteroefeningen) */}
+            {(currentExercise.type === 'multiple_choice' || currentExercise.type === 'listen_choice') && currentExercise.options && (
               <div className="space-y-2">
                 {currentExercise.options.map((opt) => {
                   let cls = 'w-full rounded-lg border-2 px-4 py-3 text-left text-sm font-medium transition-all '
@@ -315,6 +319,15 @@ export default function GrammaticaPage() {
                   </button>
                 )}
               </div>
+            )}
+
+            {/* Woordvolgorde */}
+            {currentExercise.type === 'reorder' && (
+              <ReorderExercise
+                exercise={currentExercise}
+                response={response}
+                onAnswer={(value) => recordAnswer(currentExercise, value)}
+              />
             )}
 
             {/* Feedback — pas zichtbaar NA antwoorden */}
@@ -374,4 +387,78 @@ export default function GrammaticaPage() {
   }
 
   return null
+}
+
+// Klik woorden in de juiste volgorde om de zin te bouwen.
+function ReorderExercise({
+  exercise,
+  response,
+  onAnswer,
+}: {
+  exercise: GrammarExercise
+  response?: Response
+  onAnswer: (value: string) => void
+}) {
+  const answered = !!response
+  const correctWords = useMemo(() => exercise.answer.split(' '), [exercise.answer])
+  const [bank, setBank] = useState<string[]>([])
+  const [built, setBuilt] = useState<string[]>([])
+
+  useEffect(() => {
+    const shuffled = [...correctWords]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    setBank(shuffled)
+    setBuilt([])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exercise.id])
+
+  const pick = (idx: number) => {
+    if (answered) return
+    setBuilt((b) => [...b, bank[idx]])
+    setBank((b) => b.filter((_, i) => i !== idx))
+  }
+
+  const unpick = (idx: number) => {
+    if (answered) return
+    setBank((b) => [...b, built[idx]])
+    setBuilt((b) => b.filter((_, i) => i !== idx))
+  }
+
+  return (
+    <div>
+      <div className="min-h-[3.5rem] mb-3 flex flex-wrap items-center gap-2 rounded-lg border-2 border-dashed border-slate-200 p-3">
+        {built.length === 0 && <span className="text-sm text-slate-400">Klik op de woorden hieronder om de zin te bouwen…</span>}
+        {built.map((w, i) => (
+          <button
+            key={i}
+            onClick={() => unpick(i)}
+            disabled={answered}
+            className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-90"
+          >
+            {w}
+          </button>
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-2 mb-4">
+        {bank.map((w, i) => (
+          <button
+            key={i}
+            onClick={() => pick(i)}
+            disabled={answered}
+            className="rounded-md border-2 border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:border-blue-400 hover:bg-blue-50"
+          >
+            {w}
+          </button>
+        ))}
+      </div>
+      {!answered && (
+        <button className="btn-primary w-full" disabled={bank.length > 0} onClick={() => onAnswer(built.join(' '))}>
+          Controleer
+        </button>
+      )}
+    </div>
+  )
 }

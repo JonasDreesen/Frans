@@ -2,7 +2,7 @@ export interface VocabularyItem {
   dutch: string
   french: string
   category: string
-  level: 'A1' | 'A2' | 'B1'
+  level: 'A1' | 'A2' | 'B1' | 'B2'
   exampleNl: string
   exampleFr: string
   isBelgian: boolean
@@ -125,6 +125,187 @@ export const vocabularyData: VocabularyItem[] = [
   { order: 125, dutch: 'Het ziekenhuis', french: 'L\'hôpital', category: 'Plaatsen', level: 'A1', exampleNl: 'Waar is het dichtstbijzijnde ziekenhuis?', exampleFr: 'Où est l\'hôpital le plus proche?', isBelgian: false },
   { order: 126, dutch: 'De apotheek', french: 'La pharmacie', category: 'Plaatsen', level: 'A1', exampleNl: 'Is er een apotheek in de buurt?', exampleFr: 'Y a-t-il une pharmacie près d\'ici?', isBelgian: false },
   { order: 127, dutch: 'De bank', french: 'La banque', category: 'Plaatsen', level: 'A1', exampleNl: 'Ik moet naar de bank.', exampleFr: 'Je dois aller à la banque.', isBelgian: false },
+
+  // ─── TIJD & DATUM A1 ───────────────────────────────────────────────────────
+  { order: 130, dutch: 'De tijd', french: 'Le temps', category: 'Tijd & datum', level: 'A1', exampleNl: 'Ik heb geen tijd.', exampleFr: 'Je n\'ai pas le temps.', isBelgian: false },
+  { order: 131, dutch: 'Het uur', french: 'L\'heure', category: 'Tijd & datum', level: 'A1', exampleNl: 'Hoe laat is het?', exampleFr: 'Quelle heure est-il?', isBelgian: false },
+  { order: 132, dutch: 'Vandaag', french: 'Aujourd\'hui', category: 'Tijd & datum', level: 'A1', exampleNl: 'Vandaag is het maandag.', exampleFr: 'Aujourd\'hui, c\'est lundi.', isBelgian: false },
+  { order: 133, dutch: 'Morgen', french: 'Demain', category: 'Tijd & datum', level: 'A1', exampleNl: 'Tot morgen!', exampleFr: 'À demain!', isBelgian: false },
+  { order: 134, dutch: 'Gisteren', french: 'Hier', category: 'Tijd & datum', level: 'A1', exampleNl: 'Gisteren was ik ziek.', exampleFr: 'Hier, j\'étais malade.', isBelgian: false },
+  { order: 135, dutch: 'De week', french: 'La semaine', category: 'Tijd & datum', level: 'A1', exampleNl: 'Volgende week ga ik op reis.', exampleFr: 'La semaine prochaine, je pars en voyage.', isBelgian: false },
+  { order: 136, dutch: 'De maand', french: 'Le mois', category: 'Tijd & datum', level: 'A1', exampleNl: 'Deze maand werk ik veel.', exampleFr: 'Ce mois-ci, je travaille beaucoup.', isBelgian: false },
+  { order: 137, dutch: 'Het jaar', french: 'L\'année', category: 'Tijd & datum', level: 'A1', exampleNl: 'Gelukkig nieuwjaar!', exampleFr: 'Bonne année!', isBelgian: false },
+  { order: 138, dutch: 'Nu', french: 'Maintenant', category: 'Tijd & datum', level: 'A1', exampleNl: 'Ik moet nu gaan.', exampleFr: 'Je dois partir maintenant.', isBelgian: false },
+  { order: 139, dutch: 'Later', french: 'Plus tard', category: 'Tijd & datum', level: 'A1', exampleNl: 'We zien elkaar later.', exampleFr: 'On se voit plus tard.', isBelgian: false },
+
+  // ─── DAGEN VAN DE WEEK A1 ──────────────────────────────────────────────────
+  { order: 140, dutch: 'Maandag', french: 'Lundi', category: 'Dagen van de week', level: 'A1', exampleNl: 'Op maandag werk ik thuis.', exampleFr: 'Le lundi, je travaille à la maison.', isBelgian: false },
+  { order: 141, dutch: 'Dinsdag', french: 'Mardi', category: 'Dagen van de week', level: 'A1', exampleNl: 'Dinsdag heb ik les.', exampleFr: 'Mardi, j\'ai cours.', isBelgian: false },
+  { order: 142, dutch: 'Woensdag', french: 'Mercredi', category: 'Dagen van de week', level: 'A1', exampleNl: 'Woensdagnamiddag is er geen school.', exampleFr: 'Le mercredi après-midi, il n\'y a pas d\'école.', isBelgian: false },
+  { order: 143, dutch: 'Donderdag', french: 'Jeudi', category: 'Dagen van de week', level: 'A1', exampleNl: 'Donderdag ga ik sporten.', exampleFr: 'Jeudi, je vais faire du sport.', isBelgian: false },
+  { order: 144, dutch: 'Vrijdag', french: 'Vendredi', category: 'Dagen van de week', level: 'A1', exampleNl: 'Vrijdag is mijn lievelingsdag.', exampleFr: 'Vendredi est mon jour préféré.', isBelgian: false },
+  { order: 145, dutch: 'Zaterdag', french: 'Samedi', category: 'Dagen van de week', level: 'A1', exampleNl: 'Op zaterdag winkel ik.', exampleFr: 'Le samedi, je fais les courses.', isBelgian: false },
+  { order: 146, dutch: 'Zondag', french: 'Dimanche', category: 'Dagen van de week', level: 'A1', exampleNl: 'Zondag rust ik uit.', exampleFr: 'Le dimanche, je me repose.', isBelgian: false },
+
+  // ─── WEER A1/A2 ────────────────────────────────────────────────────────────
+  { order: 150, dutch: 'Het weer', french: 'Le temps', category: 'Weer', level: 'A1', exampleNl: 'Hoe is het weer vandaag?', exampleFr: 'Quel temps fait-il aujourd\'hui?', isBelgian: false },
+  { order: 151, dutch: 'De zon', french: 'Le soleil', category: 'Weer', level: 'A1', exampleNl: 'De zon schijnt.', exampleFr: 'Le soleil brille.', isBelgian: false },
+  { order: 152, dutch: 'De regen', french: 'La pluie', category: 'Weer', level: 'A1', exampleNl: 'Ik hou niet van regen.', exampleFr: 'Je n\'aime pas la pluie.', isBelgian: false },
+  { order: 153, dutch: 'De wind', french: 'Le vent', category: 'Weer', level: 'A1', exampleNl: 'Er is veel wind vandaag.', exampleFr: 'Il y a beaucoup de vent aujourd\'hui.', isBelgian: false },
+  { order: 154, dutch: 'De sneeuw', french: 'La neige', category: 'Weer', level: 'A1', exampleNl: 'Het sneeuwt in de winter.', exampleFr: 'Il neige en hiver.', isBelgian: false },
+  { order: 155, dutch: 'Het is warm', french: 'Il fait chaud', category: 'Weer', level: 'A1', exampleNl: 'Het is warm in de zomer.', exampleFr: 'Il fait chaud en été.', isBelgian: false },
+  { order: 156, dutch: 'Het is koud', french: 'Il fait froid', category: 'Weer', level: 'A1', exampleNl: 'Het is koud vandaag.', exampleFr: 'Il fait froid aujourd\'hui.', isBelgian: false },
+  { order: 157, dutch: 'De wolk', french: 'Le nuage', category: 'Weer', level: 'A2', exampleNl: 'Er zijn veel wolken.', exampleFr: 'Il y a beaucoup de nuages.', isBelgian: false },
+  { order: 158, dutch: 'De storm', french: 'La tempête', category: 'Weer', level: 'A2', exampleNl: 'Er komt een storm aan.', exampleFr: 'Une tempête arrive.', isBelgian: false },
+  { order: 159, dutch: 'De temperatuur', french: 'La température', category: 'Weer', level: 'A2', exampleNl: 'Wat is de temperatuur buiten?', exampleFr: 'Quelle est la température extérieure?', isBelgian: false },
+
+  // ─── LICHAAM A1/A2 ─────────────────────────────────────────────────────────
+  { order: 160, dutch: 'Het hoofd', french: 'La tête', category: 'Lichaam', level: 'A1', exampleNl: 'Mijn hoofd doet pijn.', exampleFr: 'J\'ai mal à la tête.', isBelgian: false },
+  { order: 161, dutch: 'De hand', french: 'La main', category: 'Lichaam', level: 'A1', exampleNl: 'Geef me je hand.', exampleFr: 'Donne-moi ta main.', isBelgian: false },
+  { order: 162, dutch: 'De voet', french: 'Le pied', category: 'Lichaam', level: 'A1', exampleNl: 'Mijn voet doet pijn.', exampleFr: 'J\'ai mal au pied.', isBelgian: false },
+  { order: 163, dutch: 'De ogen', french: 'Les yeux', category: 'Lichaam', level: 'A1', exampleNl: 'Ze heeft blauwe ogen.', exampleFr: 'Elle a les yeux bleus.', isBelgian: false },
+  { order: 164, dutch: 'De mond', french: 'La bouche', category: 'Lichaam', level: 'A1', exampleNl: 'Doe je mond open.', exampleFr: 'Ouvre la bouche.', isBelgian: false },
+  { order: 165, dutch: 'De buik', french: 'Le ventre', category: 'Lichaam', level: 'A1', exampleNl: 'Mijn buik doet pijn.', exampleFr: 'J\'ai mal au ventre.', isBelgian: false },
+  { order: 166, dutch: 'De rug', french: 'Le dos', category: 'Lichaam', level: 'A2', exampleNl: 'Hij heeft rugpijn.', exampleFr: 'Il a mal au dos.', isBelgian: false },
+  { order: 167, dutch: 'Het hart', french: 'Le cœur', category: 'Lichaam', level: 'A2', exampleNl: 'Mijn hart klopt snel.', exampleFr: 'Mon cœur bat vite.', isBelgian: false },
+  { order: 168, dutch: 'De neus', french: 'Le nez', category: 'Lichaam', level: 'A1', exampleNl: 'Ze heeft een kleine neus.', exampleFr: 'Elle a un petit nez.', isBelgian: false },
+  { order: 169, dutch: 'Het oor', french: 'L\'oreille', category: 'Lichaam', level: 'A1', exampleNl: 'Ik heb oorpijn.', exampleFr: 'J\'ai mal à l\'oreille.', isBelgian: false },
+
+  // ─── GEZONDHEID A2 ─────────────────────────────────────────────────────────
+  { order: 170, dutch: 'Ziek zijn', french: 'Être malade', category: 'Gezondheid', level: 'A1', exampleNl: 'Ik ben ziek vandaag.', exampleFr: 'Je suis malade aujourd\'hui.', isBelgian: false },
+  { order: 171, dutch: 'De dokter', french: 'Le médecin', category: 'Gezondheid', level: 'A1', exampleNl: 'Ik moet naar de dokter.', exampleFr: 'Je dois aller chez le médecin.', isBelgian: false },
+  { order: 172, dutch: 'De pijn', french: 'La douleur', category: 'Gezondheid', level: 'A2', exampleNl: 'Ik heb veel pijn.', exampleFr: 'J\'ai beaucoup de douleur.', isBelgian: false },
+  { order: 173, dutch: 'De griep', french: 'La grippe', category: 'Gezondheid', level: 'A2', exampleNl: 'Hij heeft de griep.', exampleFr: 'Il a la grippe.', isBelgian: false },
+  { order: 174, dutch: 'De afspraak', french: 'Le rendez-vous', category: 'Gezondheid', level: 'A2', exampleNl: 'Ik heb een afspraak bij de dokter.', exampleFr: 'J\'ai un rendez-vous chez le médecin.', isBelgian: false },
+  { order: 175, dutch: 'Het medicijn', french: 'Le médicament', category: 'Gezondheid', level: 'A2', exampleNl: 'Neem dit medicijn driemaal per dag.', exampleFr: 'Prenez ce médicament trois fois par jour.', isBelgian: false },
+  { order: 176, dutch: 'Beter worden', french: 'Aller mieux', category: 'Gezondheid', level: 'A2', exampleNl: 'Ik hoop dat je snel beter wordt.', exampleFr: 'J\'espère que tu vas vite aller mieux.', isBelgian: false },
+  { order: 177, dutch: 'Gezond', french: 'En bonne santé', category: 'Gezondheid', level: 'A2', exampleNl: 'Hij is heel gezond.', exampleFr: 'Il est en bonne santé.', isBelgian: false },
+  { order: 178, dutch: 'De apotheker', french: 'Le pharmacien', category: 'Gezondheid', level: 'A2', exampleNl: 'De apotheker geeft advies.', exampleFr: 'Le pharmacien donne des conseils.', isBelgian: false },
+
+  // ─── HUIS & WONEN A1/A2 ────────────────────────────────────────────────────
+  { order: 180, dutch: 'Het huis', french: 'La maison', category: 'Huis & wonen', level: 'A1', exampleNl: 'Ik woon in een groot huis.', exampleFr: 'J\'habite dans une grande maison.', isBelgian: false },
+  { order: 181, dutch: 'De kamer', french: 'La pièce', category: 'Huis & wonen', level: 'A1', exampleNl: 'Dit huis heeft vijf kamers.', exampleFr: 'Cette maison a cinq pièces.', isBelgian: false },
+  { order: 182, dutch: 'De keuken', french: 'La cuisine', category: 'Huis & wonen', level: 'A1', exampleNl: 'Ik kook in de keuken.', exampleFr: 'Je cuisine dans la cuisine.', isBelgian: false },
+  { order: 183, dutch: 'De slaapkamer', french: 'La chambre', category: 'Huis & wonen', level: 'A1', exampleNl: 'Mijn slaapkamer is klein.', exampleFr: 'Ma chambre est petite.', isBelgian: false },
+  { order: 184, dutch: 'De badkamer', french: 'La salle de bain', category: 'Huis & wonen', level: 'A1', exampleNl: 'De badkamer is boven.', exampleFr: 'La salle de bain est en haut.', isBelgian: false },
+  { order: 185, dutch: 'De tuin', french: 'Le jardin', category: 'Huis & wonen', level: 'A1', exampleNl: 'We hebben een mooie tuin.', exampleFr: 'Nous avons un beau jardin.', isBelgian: false },
+  { order: 186, dutch: 'De deur', french: 'La porte', category: 'Huis & wonen', level: 'A1', exampleNl: 'Doe de deur dicht.', exampleFr: 'Ferme la porte.', isBelgian: false },
+  { order: 187, dutch: 'Het raam', french: 'La fenêtre', category: 'Huis & wonen', level: 'A1', exampleNl: 'Open het raam, alsjeblieft.', exampleFr: 'Ouvre la fenêtre, s\'il te plaît.', isBelgian: false },
+  { order: 188, dutch: 'De trap', french: 'L\'escalier', category: 'Huis & wonen', level: 'A2', exampleNl: 'De trap is steil.', exampleFr: 'L\'escalier est raide.', isBelgian: false },
+  { order: 189, dutch: 'De muur', french: 'Le mur', category: 'Huis & wonen', level: 'A2', exampleNl: 'Er hangt een schilderij aan de muur.', exampleFr: 'Il y a un tableau accroché au mur.', isBelgian: false },
+
+  // ─── KLEDING A1/A2 ─────────────────────────────────────────────────────────
+  { order: 190, dutch: 'De broek', french: 'Le pantalon', category: 'Kleding', level: 'A1', exampleNl: 'Deze broek is te groot.', exampleFr: 'Ce pantalon est trop grand.', isBelgian: false },
+  { order: 191, dutch: 'Het hemd', french: 'La chemise', category: 'Kleding', level: 'A1', exampleNl: 'Hij draagt een wit hemd.', exampleFr: 'Il porte une chemise blanche.', isBelgian: false },
+  { order: 192, dutch: 'De jas', french: 'Le manteau', category: 'Kleding', level: 'A1', exampleNl: 'Trek je jas aan, het is koud.', exampleFr: 'Mets ton manteau, il fait froid.', isBelgian: false },
+  { order: 193, dutch: 'De schoenen', french: 'Les chaussures', category: 'Kleding', level: 'A1', exampleNl: 'Mijn schoenen zijn nieuw.', exampleFr: 'Mes chaussures sont neuves.', isBelgian: false },
+  { order: 194, dutch: 'De jurk', french: 'La robe', category: 'Kleding', level: 'A1', exampleNl: 'Ze draagt een mooie jurk.', exampleFr: 'Elle porte une belle robe.', isBelgian: false },
+  { order: 195, dutch: 'De muts', french: 'Le bonnet', category: 'Kleding', level: 'A2', exampleNl: 'Draag een muts in de winter.', exampleFr: 'Porte un bonnet en hiver.', isBelgian: false },
+  { order: 196, dutch: 'De sjaal', french: 'L\'écharpe', category: 'Kleding', level: 'A2', exampleNl: 'Ik draag graag een sjaal.', exampleFr: 'J\'aime porter une écharpe.', isBelgian: false },
+  { order: 197, dutch: 'Dragen', french: 'Porter', category: 'Kleding', level: 'A2', exampleNl: 'Wat draag je morgen?', exampleFr: 'Qu\'est-ce que tu portes demain?', isBelgian: false },
+  { order: 198, dutch: 'Passen', french: 'Essayer', category: 'Kleding', level: 'A2', exampleNl: 'Mag ik deze broek passen?', exampleFr: 'Puis-je essayer ce pantalon?', isBelgian: false },
+  { order: 199, dutch: 'De maat', french: 'La taille', category: 'Kleding', level: 'A2', exampleNl: 'Welke maat heb je?', exampleFr: 'Quelle taille fais-tu?', isBelgian: false },
+
+  // ─── HOBBY'S & VRIJE TIJD A1/A2 ────────────────────────────────────────────
+  { order: 200, dutch: 'Lezen', french: 'Lire', category: 'Hobby\'s & vrije tijd', level: 'A1', exampleNl: 'Ik lees graag boeken.', exampleFr: 'J\'aime lire des livres.', isBelgian: false },
+  { order: 201, dutch: 'Sporten', french: 'Faire du sport', category: 'Hobby\'s & vrije tijd', level: 'A1', exampleNl: 'Hij sport elke dag.', exampleFr: 'Il fait du sport tous les jours.', isBelgian: false },
+  { order: 202, dutch: 'Zwemmen', french: 'Nager', category: 'Hobby\'s & vrije tijd', level: 'A1', exampleNl: 'We gaan zwemmen in de zomer.', exampleFr: 'Nous allons nager en été.', isBelgian: false },
+  { order: 203, dutch: 'Dansen', french: 'Danser', category: 'Hobby\'s & vrije tijd', level: 'A1', exampleNl: 'Ze danst heel goed.', exampleFr: 'Elle danse très bien.', isBelgian: false },
+  { order: 204, dutch: 'Muziek luisteren', french: 'Écouter de la musique', category: 'Hobby\'s & vrije tijd', level: 'A1', exampleNl: 'Ik luister graag naar muziek.', exampleFr: 'J\'aime écouter de la musique.', isBelgian: false },
+  { order: 205, dutch: 'Koken', french: 'Cuisiner', category: 'Hobby\'s & vrije tijd', level: 'A1', exampleNl: 'Mijn vader kookt elke avond.', exampleFr: 'Mon père cuisine tous les soirs.', isBelgian: false },
+  { order: 206, dutch: 'Fotograferen', french: 'Photographier', category: 'Hobby\'s & vrije tijd', level: 'A2', exampleNl: 'Hij houdt van fotograferen.', exampleFr: 'Il aime photographier.', isBelgian: false },
+  { order: 207, dutch: 'Wandelen', french: 'Se promener', category: 'Hobby\'s & vrije tijd', level: 'A1', exampleNl: 'We wandelen graag in het park.', exampleFr: 'Nous aimons nous promener dans le parc.', isBelgian: false },
+  { order: 208, dutch: 'Fietsen', french: 'Faire du vélo', category: 'Hobby\'s & vrije tijd', level: 'A1', exampleNl: 'In Vlaanderen fietst iedereen.', exampleFr: 'En Flandre, tout le monde fait du vélo.', isBelgian: true },
+  { order: 209, dutch: 'Voetballen', french: 'Jouer au football', category: 'Hobby\'s & vrije tijd', level: 'A1', exampleNl: 'De kinderen voetballen buiten.', exampleFr: 'Les enfants jouent au football dehors.', isBelgian: false },
+
+  // ─── EMOTIES & GEVOELENS A2/B1 ─────────────────────────────────────────────
+  { order: 210, dutch: 'Blij', french: 'Content(e)', category: 'Emoties & gevoelens', level: 'A1', exampleNl: 'Ik ben heel blij vandaag.', exampleFr: 'Je suis très content aujourd\'hui.', isBelgian: false },
+  { order: 211, dutch: 'Verdrietig', french: 'Triste', category: 'Emoties & gevoelens', level: 'A1', exampleNl: 'Ze is verdrietig.', exampleFr: 'Elle est triste.', isBelgian: false },
+  { order: 212, dutch: 'Boos', french: 'Fâché(e)', category: 'Emoties & gevoelens', level: 'A2', exampleNl: 'Hij is boos op mij.', exampleFr: 'Il est fâché contre moi.', isBelgian: false },
+  { order: 213, dutch: 'Bang', french: 'Effrayé(e)', category: 'Emoties & gevoelens', level: 'A2', exampleNl: 'Het kind is bang in het donker.', exampleFr: 'L\'enfant est effrayé dans le noir.', isBelgian: false },
+  { order: 214, dutch: 'Moe', french: 'Fatigué(e)', category: 'Emoties & gevoelens', level: 'A1', exampleNl: 'Ik ben heel moe.', exampleFr: 'Je suis très fatigué.', isBelgian: false },
+  { order: 215, dutch: 'Verveeld', french: 'Ennuyé(e)', category: 'Emoties & gevoelens', level: 'A2', exampleNl: 'De kinderen zijn verveeld.', exampleFr: 'Les enfants sont ennuyés.', isBelgian: false },
+  { order: 216, dutch: 'Trots', french: 'Fier / Fière', category: 'Emoties & gevoelens', level: 'A2', exampleNl: 'Ik ben trots op jou.', exampleFr: 'Je suis fier de toi.', isBelgian: false },
+  { order: 217, dutch: 'Verbaasd', french: 'Surpris(e)', category: 'Emoties & gevoelens', level: 'B1', exampleNl: 'Ik was erg verbaasd.', exampleFr: 'J\'étais très surpris.', isBelgian: false },
+  { order: 218, dutch: 'Zenuwachtig', french: 'Nerveux / Nerveuse', category: 'Emoties & gevoelens', level: 'B1', exampleNl: 'Ze is zenuwachtig voor het examen.', exampleFr: 'Elle est nerveuse avant l\'examen.', isBelgian: false },
+  { order: 219, dutch: 'Kalm', french: 'Calme', category: 'Emoties & gevoelens', level: 'A2', exampleNl: 'Blijf kalm.', exampleFr: 'Reste calme.', isBelgian: false },
+
+  // ─── ONDERWIJS A1/A2 ───────────────────────────────────────────────────────
+  { order: 220, dutch: 'De school', french: 'L\'école', category: 'Onderwijs', level: 'A1', exampleNl: 'De school begint om 8 uur.', exampleFr: 'L\'école commence à 8 heures.', isBelgian: false },
+  { order: 221, dutch: 'De universiteit', french: 'L\'université', category: 'Onderwijs', level: 'A1', exampleNl: 'Ze studeert aan de universiteit.', exampleFr: 'Elle étudie à l\'université.', isBelgian: false },
+  { order: 222, dutch: 'De leraar', french: 'Le professeur', category: 'Onderwijs', level: 'A1', exampleNl: 'Onze leraar is heel aardig.', exampleFr: 'Notre professeur est très sympa.', isBelgian: false },
+  { order: 223, dutch: 'De student', french: 'L\'étudiant(e)', category: 'Onderwijs', level: 'A1', exampleNl: 'Hij is student aan de universiteit.', exampleFr: 'Il est étudiant à l\'université.', isBelgian: false },
+  { order: 224, dutch: 'Het examen', french: 'L\'examen', category: 'Onderwijs', level: 'A2', exampleNl: 'Ik heb morgen een examen.', exampleFr: 'J\'ai un examen demain.', isBelgian: false },
+  { order: 225, dutch: 'Het huiswerk', french: 'Les devoirs', category: 'Onderwijs', level: 'A1', exampleNl: 'Ik moet mijn huiswerk maken.', exampleFr: 'Je dois faire mes devoirs.', isBelgian: false },
+  { order: 226, dutch: 'Leren', french: 'Apprendre', category: 'Onderwijs', level: 'A1', exampleNl: 'Ik leer Frans.', exampleFr: 'J\'apprends le français.', isBelgian: false },
+  { order: 227, dutch: 'Studeren', french: 'Étudier', category: 'Onderwijs', level: 'A1', exampleNl: 'Ze studeert elke avond.', exampleFr: 'Elle étudie tous les soirs.', isBelgian: false },
+
+  // ─── TECHNOLOGIE A1/A2 ─────────────────────────────────────────────────────
+  { order: 230, dutch: 'De computer', french: 'L\'ordinateur', category: 'Technologie', level: 'A1', exampleNl: 'Ik werk op de computer.', exampleFr: 'Je travaille sur l\'ordinateur.', isBelgian: false },
+  { order: 231, dutch: 'Het internet', french: 'L\'internet', category: 'Technologie', level: 'A1', exampleNl: 'Heb je internet thuis?', exampleFr: 'As-tu internet à la maison?', isBelgian: false },
+  { order: 232, dutch: 'De gsm', french: 'Le GSM', category: 'Technologie', level: 'A1', exampleNl: 'Mijn gsm is leeg.', exampleFr: 'Mon GSM est déchargé.', isBelgian: true },
+  { order: 233, dutch: 'Het wachtwoord', french: 'Le mot de passe', category: 'Technologie', level: 'A2', exampleNl: 'Ik ben mijn wachtwoord vergeten.', exampleFr: 'J\'ai oublié mon mot de passe.', isBelgian: false },
+  { order: 234, dutch: 'Downloaden', french: 'Télécharger', category: 'Technologie', level: 'A2', exampleNl: 'Ik download een applicatie.', exampleFr: 'Je télécharge une application.', isBelgian: false },
+  { order: 235, dutch: 'Het bestand', french: 'Le fichier', category: 'Technologie', level: 'A2', exampleNl: 'Stuur me het bestand.', exampleFr: 'Envoie-moi le fichier.', isBelgian: false },
+  { order: 236, dutch: 'De applicatie', french: 'L\'application', category: 'Technologie', level: 'A2', exampleNl: 'Deze applicatie is heel handig.', exampleFr: 'Cette application est très utile.', isBelgian: false },
+  { order: 237, dutch: 'De wifi', french: 'Le wifi', category: 'Technologie', level: 'A1', exampleNl: 'Is er hier wifi?', exampleFr: 'Y a-t-il du wifi ici?', isBelgian: false },
+
+  // ─── BOODSCHAPPEN & RESTAURANT A1/A2 ──────────────────────────────────────
+  { order: 240, dutch: 'De supermarkt', french: 'Le supermarché', category: 'Boodschappen & restaurant', level: 'A1', exampleNl: 'Ik ga naar de supermarkt.', exampleFr: 'Je vais au supermarché.', isBelgian: false },
+  { order: 241, dutch: 'Het mandje', french: 'Le panier', category: 'Boodschappen & restaurant', level: 'A2', exampleNl: 'Neem een mandje bij de ingang.', exampleFr: 'Prends un panier à l\'entrée.', isBelgian: false },
+  { order: 242, dutch: 'De rekening', french: 'L\'addition', category: 'Boodschappen & restaurant', level: 'A1', exampleNl: 'Mag ik de rekening, alstublieft?', exampleFr: 'L\'addition, s\'il vous plaît?', isBelgian: false },
+  { order: 243, dutch: 'Bestellen', french: 'Commander', category: 'Boodschappen & restaurant', level: 'A1', exampleNl: 'Wat wil je bestellen?', exampleFr: 'Qu\'est-ce que tu veux commander?', isBelgian: false },
+  { order: 244, dutch: 'Het menu', french: 'Le menu', category: 'Boodschappen & restaurant', level: 'A1', exampleNl: 'Mag ik het menu zien?', exampleFr: 'Puis-je voir le menu?', isBelgian: false },
+  { order: 245, dutch: 'De ober', french: 'Le serveur', category: 'Boodschappen & restaurant', level: 'A1', exampleNl: 'De ober brengt het eten.', exampleFr: 'Le serveur apporte le repas.', isBelgian: false },
+  { order: 246, dutch: 'Lekker', french: 'Délicieux', category: 'Boodschappen & restaurant', level: 'A1', exampleNl: 'Dit gerecht is heel lekker.', exampleFr: 'Ce plat est délicieux.', isBelgian: false },
+  { order: 247, dutch: 'De korting', french: 'La réduction', category: 'Boodschappen & restaurant', level: 'A2', exampleNl: 'Is er korting op dit product?', exampleFr: 'Y a-t-il une réduction sur ce produit?', isBelgian: false },
+  { order: 248, dutch: 'Betalen', french: 'Payer', category: 'Boodschappen & restaurant', level: 'A1', exampleNl: 'Kan ik met kaart betalen?', exampleFr: 'Puis-je payer par carte?', isBelgian: false },
+  { order: 249, dutch: 'Het wisselgeld', french: 'La monnaie', category: 'Boodschappen & restaurant', level: 'A2', exampleNl: 'Hier is uw wisselgeld.', exampleFr: 'Voici votre monnaie.', isBelgian: false },
+
+  // ─── BIJWOORDEN & VOEGWOORDEN A2/B1/B2 ─────────────────────────────────────
+  { order: 250, dutch: 'Echter', french: 'Cependant', category: 'Bijwoorden & voegwoorden', level: 'B2', exampleNl: 'Het is duur, echter wel de moeite waard.', exampleFr: 'C\'est cher, cependant ça vaut la peine.', isBelgian: false },
+  { order: 251, dutch: 'Daarom', french: 'Donc', category: 'Bijwoorden & voegwoorden', level: 'B1', exampleNl: 'Het regent, daarom blijf ik thuis.', exampleFr: 'Il pleut, donc je reste à la maison.', isBelgian: false },
+  { order: 252, dutch: 'Bovendien', french: 'De plus', category: 'Bijwoorden & voegwoorden', level: 'B2', exampleNl: 'Het is goedkoop, bovendien is het lekker.', exampleFr: 'C\'est bon marché, de plus c\'est délicieux.', isBelgian: false },
+  { order: 253, dutch: 'Omdat', french: 'Parce que', category: 'Bijwoorden & voegwoorden', level: 'A2', exampleNl: 'Ik blijf thuis omdat ik ziek ben.', exampleFr: 'Je reste à la maison parce que je suis malade.', isBelgian: false },
+  { order: 254, dutch: 'Hoewel', french: 'Bien que', category: 'Bijwoorden & voegwoorden', level: 'B2', exampleNl: 'Hoewel het regent, ga ik wandelen.', exampleFr: 'Bien qu\'il pleuve, je vais me promener.', isBelgian: false },
+  { order: 255, dutch: 'Dus', french: 'Alors', category: 'Bijwoorden & voegwoorden', level: 'A2', exampleNl: 'Ik ben moe, dus ik ga slapen.', exampleFr: 'Je suis fatigué, alors je vais dormir.', isBelgian: false },
+  { order: 256, dutch: 'Eindelijk', french: 'Enfin', category: 'Bijwoorden & voegwoorden', level: 'B1', exampleNl: 'Eindelijk is het weekend!', exampleFr: 'Enfin, c\'est le week-end!', isBelgian: false },
+  { order: 257, dutch: 'Trouwens', french: 'D\'ailleurs', category: 'Bijwoorden & voegwoorden', level: 'B2', exampleNl: 'Trouwens, heb je mijn bericht gezien?', exampleFr: 'D\'ailleurs, as-tu vu mon message?', isBelgian: false },
+  { order: 258, dutch: 'Namelijk', french: 'À savoir', category: 'Bijwoorden & voegwoorden', level: 'B2', exampleNl: 'Er zijn twee opties, namelijk A en B.', exampleFr: 'Il y a deux options, à savoir A et B.', isBelgian: false },
+  { order: 259, dutch: 'Toch', french: 'Quand même', category: 'Bijwoorden & voegwoorden', level: 'B1', exampleNl: 'Het is duur, maar ik koop het toch.', exampleFr: 'C\'est cher, mais je l\'achète quand même.', isBelgian: false },
+
+  // ─── BELGISCHE UITDRUKKINGEN UITGEBREID A2/B1 ─────────────────────────────
+  { order: 260, dutch: 'Op kot wonen (studentenkamer)', french: 'Habiter en kot', category: 'Belgische uitdrukkingen', level: 'A2', exampleNl: 'Hij woont op kot in Leuven.', exampleFr: 'Il habite en kot à Louvain.', isBelgian: true },
+  { order: 261, dutch: 'Eens (verzachtend woordje)', french: 'Une fois', category: 'Belgische uitdrukkingen', level: 'A2', exampleNl: 'Kom eens hier.', exampleFr: 'Viens une fois ici.', isBelgian: true },
+  { order: 262, dutch: 'Ik kan niet komen (Belgisch-Frans)', french: 'Je ne sais pas venir', category: 'Belgische uitdrukkingen', level: 'B1', exampleNl: 'Ik kan morgen niet komen.', exampleFr: 'Je ne sais pas venir demain.', isBelgian: true },
+  { order: 263, dutch: 'Binnen (een bepaalde termijn)', french: 'Endéans', category: 'Belgische uitdrukkingen', level: 'B1', exampleNl: 'Antwoord binnen de week.', exampleFr: 'Répondez endéans la semaine.', isBelgian: true },
+  { order: 264, dutch: 'Dat smaakt goed', french: 'Ça goûte bon', category: 'Belgische uitdrukkingen', level: 'A2', exampleNl: 'Deze soep smaakt heel goed.', exampleFr: 'Cette soupe, ça goûte bon.', isBelgian: true },
+  { order: 265, dutch: 'De vaatdoek', french: 'L\'essuie', category: 'Belgische uitdrukkingen', level: 'A2', exampleNl: 'Geef me de vaatdoek, alsjeblieft.', exampleFr: 'Donne-moi l\'essuie, s\'il te plaît.', isBelgian: true },
+
+  // ─── GEVORDERD FRANS B2 ─────────────────────────────────────────────────────
+  { order: 270, dutch: 'Desalniettemin', french: 'Néanmoins', category: 'Gevorderd Frans', level: 'B2', exampleNl: 'Het is moeilijk, desalniettemin probeer ik het.', exampleFr: 'C\'est difficile, néanmoins j\'essaie.', isBelgian: false },
+  { order: 271, dutch: 'Meer (in mindere/meerdere mate)', french: 'Davantage', category: 'Gevorderd Frans', level: 'B2', exampleNl: 'We moeten daar meer aandacht aan geven.', exampleFr: 'Nous devons y prêter davantage attention.', isBelgian: false },
+  { order: 272, dutch: 'Overwegen', french: 'Envisager', category: 'Gevorderd Frans', level: 'B2', exampleNl: 'Ik overweeg om te verhuizen.', exampleFr: 'J\'envisage de déménager.', isBelgian: false },
+  { order: 273, dutch: 'Een vraag opwerpen', french: 'Soulever une question', category: 'Gevorderd Frans', level: 'B2', exampleNl: 'Dit rapport werpt een belangrijke vraag op.', exampleFr: 'Ce rapport soulève une question importante.', isBelgian: false },
+  { order: 274, dutch: 'Daarnaast', french: 'Par ailleurs', category: 'Gevorderd Frans', level: 'B2', exampleNl: 'Daarnaast moeten we ook de kosten bekijken.', exampleFr: 'Par ailleurs, il faut aussi examiner les coûts.', isBelgian: false },
+  { order: 275, dutch: 'In vraag stellen', french: 'Remettre en question', category: 'Gevorderd Frans', level: 'B2', exampleNl: 'Hij stelt alles in vraag.', exampleFr: 'Il remet tout en question.', isBelgian: false },
+  { order: 276, dutch: 'Oproepen (een reactie)', french: 'Susciter', category: 'Gevorderd Frans', level: 'B2', exampleNl: 'Dit voorstel roept veel kritiek op.', exampleFr: 'Cette proposition suscite beaucoup de critiques.', isBelgian: false },
+  { order: 277, dutch: 'De uitdaging', french: 'Le défi', category: 'Gevorderd Frans', level: 'B1', exampleNl: 'Dit is een grote uitdaging voor ons.', exampleFr: 'C\'est un grand défi pour nous.', isBelgian: false },
+
+  // ─── WERKWOORDEN UITGEBREID A1 ─────────────────────────────────────────────
+  { order: 280, dutch: 'Beginnen', french: 'Commencer', category: 'Werkwoorden', level: 'A1', exampleNl: 'De film begint om 20 uur.', exampleFr: 'Le film commence à 20 heures.', isBelgian: false },
+  { order: 281, dutch: 'Eindigen', french: 'Terminer', category: 'Werkwoorden', level: 'A1', exampleNl: 'Wanneer eindigt de les?', exampleFr: 'Quand est-ce que le cours se termine?', isBelgian: false },
+  { order: 282, dutch: 'Begrijpen', french: 'Comprendre', category: 'Werkwoorden', level: 'A1', exampleNl: 'Ik begrijp het niet.', exampleFr: 'Je ne comprends pas.', isBelgian: false },
+  { order: 283, dutch: 'Denken', french: 'Penser', category: 'Werkwoorden', level: 'A1', exampleNl: 'Wat denk je daarvan?', exampleFr: 'Qu\'est-ce que tu en penses?', isBelgian: false },
+  { order: 284, dutch: 'Weten', french: 'Savoir', category: 'Werkwoorden', level: 'A1', exampleNl: 'Ik weet het niet.', exampleFr: 'Je ne sais pas.', isBelgian: false },
+  { order: 285, dutch: 'Kennen', french: 'Connaître', category: 'Werkwoorden', level: 'A1', exampleNl: 'Ken je deze stad?', exampleFr: 'Connais-tu cette ville?', isBelgian: false },
+  { order: 286, dutch: 'Zien', french: 'Voir', category: 'Werkwoorden', level: 'A1', exampleNl: 'Ik zie je morgen.', exampleFr: 'Je te vois demain.', isBelgian: false },
+  { order: 287, dutch: 'Horen', french: 'Entendre', category: 'Werkwoorden', level: 'A1', exampleNl: 'Ik hoor je niet goed.', exampleFr: 'Je ne t\'entends pas bien.', isBelgian: false },
+  { order: 288, dutch: 'Zoeken', french: 'Chercher', category: 'Werkwoorden', level: 'A1', exampleNl: 'Ik zoek mijn sleutels.', exampleFr: 'Je cherche mes clés.', isBelgian: false },
+  { order: 289, dutch: 'Vinden', french: 'Trouver', category: 'Werkwoorden', level: 'A1', exampleNl: 'Ik kan mijn telefoon niet vinden.', exampleFr: 'Je ne trouve pas mon téléphone.', isBelgian: false },
+  { order: 290, dutch: 'Vragen', french: 'Demander', category: 'Werkwoorden', level: 'A1', exampleNl: 'Mag ik iets vragen?', exampleFr: 'Puis-je demander quelque chose?', isBelgian: false },
+  { order: 291, dutch: 'Antwoorden', french: 'Répondre', category: 'Werkwoorden', level: 'A1', exampleNl: 'Antwoord op mijn vraag, alsjeblieft.', exampleFr: 'Réponds à ma question, s\'il te plaît.', isBelgian: false },
+  { order: 292, dutch: 'Helpen', french: 'Aider', category: 'Werkwoorden', level: 'A1', exampleNl: 'Kun je me helpen?', exampleFr: 'Peux-tu m\'aider?', isBelgian: false },
 ]
 
 export function getVocabByLevel(level: string): VocabularyItem[] {
